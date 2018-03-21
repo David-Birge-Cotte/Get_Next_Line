@@ -57,9 +57,9 @@ static char	*get_line_from_list(t_list **lst, size_t fd, char *line)
 	tmp = ft_strdup((char*)elem->content);
 	line = ft_strncpy(ft_strnew(lbi), tmp, lbi);
 	rest = ft_strlen(tmp) - ft_strlen(line);
-	tmp = ft_strncpy(ft_strnew(rest), (char*)&elem->content[lbi + 1], rest);
-	tmp[rest - 1] = '\0';
-	free(elem->content);
+	ft_strdel(&tmp);
+	tmp = ft_strncpy(ft_strnew(rest), (char*)&elem->content[lbi + 1], rest - 1);
+	ft_memdel(&(elem->content));
 	elem->content = tmp;
 	return (line);
 }
@@ -85,7 +85,8 @@ static void	add_data_to_list(t_list **lst, char *data, size_t fd)
 	else
 	{
 		str_tmp = (void*)ft_strjoin((char*)elem->content, data);
-		free(elem->content);
+		if (elem->content != NULL)
+			ft_memdel(&(elem->content));
 		elem->content = str_tmp;
 	}
 }
@@ -105,13 +106,14 @@ static char	*get_end_of_file(t_list **lst, size_t fd)
 	if (!*lst || (*lst)->content_size != fd)
 		return (NULL);
 	if ((*lst)->content)
+	{
 		line = ft_strdup((*lst)->content);
-	free((*lst)->content);
-	free(*lst);
-	*lst = NULL;
+		ft_memdel(&((*lst)->content));
+	}
+	ft_memdel((void**)lst);
 	if (line && line[0] != '\0')
 		return (line);
-	free(line);
+	ft_strdel(&line);
 	return (NULL);
 }
 
